@@ -22,6 +22,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import com.leacar21.technical.seat.function.reservation.dto.commons.APIErrorDTO;
 import com.leacar21.technical.seat.function.reservation.exceptions.BadRequestException;
+import com.leacar21.technical.seat.function.reservation.exceptions.ConflictException;
 import com.leacar21.technical.seat.function.reservation.exceptions.ResourceNotFoundException;
 
 @ControllerAdvice
@@ -42,6 +43,11 @@ public class ExceptionControllerAdvice extends ResponseEntityExceptionHandler {
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<APIErrorDTO> handlerBadRequestException(HttpServletRequest request, Exception ex) {
         return handlerException(request, ex, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<APIErrorDTO> handlerConflictExceptionException(HttpServletRequest request, Exception ex) {
+        return handlerException(request, ex, HttpStatus.CONFLICT);
     }
 
     // --------------

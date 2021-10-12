@@ -3,6 +3,7 @@ package com.leacar21.technical.seat.function.reservation.persistence.model;
 import java.util.List;
 import java.util.UUID;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -37,7 +38,7 @@ public class Reservation extends AbstractEntityJPA {
     @Column(name = "customer_name")
     private String customerName;
 
-    @OneToMany(mappedBy = "reservation")
+    @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL)
     private List<ReservationItem> items;
 
     @ManyToOne(optional = false)
