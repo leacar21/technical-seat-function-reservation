@@ -68,7 +68,7 @@ public class ReservationServiceImpl implements ReservationService {
         // Update sectionSeat
         // TODO: paralelizar (y evaluar asincronismo)
         for (ReservationItemDTO item : reservationDTO.getItems()) {
-            var sectionSeatDTO = SectionSeatDTO.builder().code(item.getSectionSeatCode()).build();
+            var sectionSeatDTO = SectionSeatDTO.builder().code(item.getSectionSeatCode()).available(false).build();
             this.showCatalogClient.updateSectionSeat(sectionSeatDTO);
         }
 
