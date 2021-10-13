@@ -9,10 +9,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import com.leacar21.technical.seat.function.reservation.clients.rest.ShowCatalogClient;
+import com.leacar21.technical.seat.function.reservation.clients.rest.api.SectionSeatDTO;
 import com.leacar21.technical.seat.function.reservation.converters.ReservationConverter;
 import com.leacar21.technical.seat.function.reservation.dto.ReservationDTO;
+import com.leacar21.technical.seat.function.reservation.dto.ReservationItemDTO;
 import com.leacar21.technical.seat.function.reservation.exceptions.ConflictException;
 import com.leacar21.technical.seat.function.reservation.persistence.dao.PortalDAO;
 import com.leacar21.technical.seat.function.reservation.persistence.dao.ReservationDAO;
@@ -33,13 +35,15 @@ public class ReservationServiceImpl implements ReservationService {
     @Autowired
     private ReservationConverter reservationConverter;
 
+    @Autowired
+    private ShowCatalogClient showCatalogClient;
+
     @Override
     public List<ReservationDTO> getAll() {
         var listReservation = this.reservationDAO.findAll();
         return this.reservationConverter.toDTO(listReservation);
     }
 
-    @Transactional(readOnly = false)
     @Override
     public ReservationDTO create(ReservationDTO reservationDTO) {
 
@@ -61,7 +65,12 @@ public class ReservationServiceImpl implements ReservationService {
             throw new ConflictException("Seat is not available");
         }
 
-        // TODO: Update sectionSeat
+        // Update sectionSeat
+        // TODO: paralelizar (y evaluar asincronismo)
+        for (ReservationItemDTO item : reservationDTO.getItems()) {
+            var sectionSeatDTO = SectionSeatDTO.builder().code(item.getSectionSeatCode()).build();
+            this.showCatalogClient.updateSectionSeat(sectionSeatDTO);
+        }
 
         return this.reservationConverter.toDTO(savedReservation);
     }

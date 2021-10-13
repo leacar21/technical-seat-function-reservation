@@ -9,6 +9,7 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.retry.annotation.EnableRetry;
 import org.zalando.logbook.BodyFilter;
 import org.zalando.logbook.BodyFilters;
 import org.zalando.logbook.Logbook;
@@ -16,6 +17,7 @@ import org.zalando.logbook.json.JsonBodyFilters;
 
 import com.leacar21.technical.seat.function.reservation.constants.BeanNames;
 
+@EnableRetry(proxyTargetClass = true)
 @Configuration
 public class MainConfig {
 
