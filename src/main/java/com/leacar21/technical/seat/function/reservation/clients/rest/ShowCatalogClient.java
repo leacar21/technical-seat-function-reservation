@@ -13,6 +13,7 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 import com.leacar21.technical.seat.function.reservation.clients.rest.api.SectionSeatDTO;
@@ -59,7 +60,7 @@ public class ShowCatalogClient {
 
     // ------------------------------
 
-    @Retryable(include = { ApiException.class, Exception.class }, //
+    @Retryable(include = { ApiException.class }, //
             backoff = @Backoff(delay = 1000, maxDelay = 5000), //
             maxAttempts = 3)
     public void updateSectionSeat(SectionSeatDTO sectionSeatDTO) {
@@ -67,8 +68,8 @@ public class ShowCatalogClient {
             String url = this.basePath + this.resourceSectionSeats + "/" + sectionSeatDTO.getCode();
             HttpEntity<SectionSeatDTO> request = new HttpEntity<>(sectionSeatDTO);
             this.restClient.patchForObject(url, request, SectionSeatDTO.class);
-        } catch (Exception e) {
-            this.log.warn("Show client error executing updateSectionSeat. Details: {}", e.getMessage(), e);
+        } catch (ResourceAccessException e) {
+            this.log.warn("Show client error executing updateSectionSeat");
             throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
