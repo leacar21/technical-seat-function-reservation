@@ -2,8 +2,6 @@ package com.leacar21.technical.seat.function.reservation.controllers;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,10 +13,10 @@ import com.leacar21.technical.seat.function.reservation.dto.PortalDTO;
 import com.leacar21.technical.seat.function.reservation.services.PortalService;
 
 @RestController()
-@RequestMapping("portals")
+@RequestMapping(PortalController.PORTALS_RESOURCE)
 public class PortalController {
 
-    Logger log = LoggerFactory.getLogger(PortalController.class);
+    public static final String PORTALS_RESOURCE = "portals";
 
     @Autowired
     private PortalService portalService;
