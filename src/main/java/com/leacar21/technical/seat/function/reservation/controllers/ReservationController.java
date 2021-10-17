@@ -36,6 +36,7 @@ public class ReservationController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("#oauth2.hasAnyScope('" + OAuthScopes.SCOPE_PORTAL + "')")
     public List<ReservationDTO> getAll() {
         return this.reservationService.getAll();
     }
