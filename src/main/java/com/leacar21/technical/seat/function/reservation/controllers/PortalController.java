@@ -16,7 +16,7 @@ import com.leacar21.technical.seat.function.reservation.services.PortalService;
 @RequestMapping(PortalController.PORTALS_RESOURCE)
 public class PortalController {
 
-    public static final String PORTALS_RESOURCE = "portals";
+    public static final String PORTALS_RESOURCE = "/portals";
 
     @Autowired
     private PortalService portalService;
