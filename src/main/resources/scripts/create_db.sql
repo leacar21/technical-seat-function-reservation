@@ -1,6 +1,8 @@
-CREATE SCHEMA IF NOT EXISTS `reservations` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+-- CREATE SCHEMA IF NOT EXISTS `reservations` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
-USE `reservations`;
+-- USE `reservations`;
+
+USE `heroku_ece0f54a09b5458`;
 
 CREATE TABLE IF NOT EXISTS `portal`
 (
