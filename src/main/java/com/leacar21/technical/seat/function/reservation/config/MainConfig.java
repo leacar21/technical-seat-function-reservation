@@ -9,6 +9,10 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.zalando.logbook.BodyFilter;
 import org.zalando.logbook.BodyFilters;
 import org.zalando.logbook.Logbook;
@@ -17,7 +21,9 @@ import org.zalando.logbook.json.JsonBodyFilters;
 import com.leacar21.technical.seat.function.reservation.constants.BeanNames;
 
 @Configuration
-public class MainConfig {
+@EnableRetry(proxyTargetClass = true)
+@EnableWebMvc
+public class MainConfig implements WebMvcConfigurer {
 
     @Bean
     public Logbook logbook() {
@@ -27,11 +33,10 @@ public class MainConfig {
                 JsonBodyFilters.replaceJsonStringProperty(Set.of("password", "pass", "secret"), "XXX"));
 
         // Para excluir algunos path
-        return Logbook.builder().bodyFilter(customBodyFilter) //
-                .condition(exclude( //
-                        requestTo("/health"), //
-                        requestTo("/admin/**"))) //
-                .build(); //
+        return Logbook.builder()
+                      .bodyFilter(customBodyFilter)
+                      .condition(exclude(requestTo("/health"), requestTo("/admin/**")))
+                      .build();
     }
 
     @Bean(name = BeanNames.STRICT_MODEL_MAPPER)
@@ -40,6 +45,15 @@ public class MainConfig {
         var configuration = modelMapper.getConfiguration();
         configuration.setMatchingStrategy(MatchingStrategies.STRICT);
         return modelMapper;
+    }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("swagger-ui.html")
+                .addResourceLocations("classpath:/META-INF/resources/");
+
+        registry.addResourceHandler("/webjars/**")
+                .addResourceLocations("classpath:/META-INF/resources/webjars/");
     }
 
 }

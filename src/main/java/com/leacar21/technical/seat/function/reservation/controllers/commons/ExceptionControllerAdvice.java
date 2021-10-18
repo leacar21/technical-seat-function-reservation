@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -22,6 +23,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import com.leacar21.technical.seat.function.reservation.dto.commons.APIErrorDTO;
 import com.leacar21.technical.seat.function.reservation.exceptions.BadRequestException;
+import com.leacar21.technical.seat.function.reservation.exceptions.ConflictException;
 import com.leacar21.technical.seat.function.reservation.exceptions.ResourceNotFoundException;
 
 @ControllerAdvice
@@ -44,6 +46,16 @@ public class ExceptionControllerAdvice extends ResponseEntityExceptionHandler {
         return handlerException(request, ex, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<APIErrorDTO> handlerConflictException(HttpServletRequest request, Exception ex) {
+        return handlerException(request, ex, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<APIErrorDTO> handlerAccessDeniedException(HttpServletRequest request, Exception ex) {
+        return handlerException(request, ex, HttpStatus.UNAUTHORIZED, false);
+    }
+
     // --------------
 
     /**
@@ -55,8 +67,11 @@ public class ExceptionControllerAdvice extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers,
             HttpStatus status, WebRequest request) {
 
-        Map<String, List<String>> errors = ex.getBindingResult().getFieldErrors().stream().collect(
-                Collectors.groupingBy(FieldError::getField, Collectors.mapping(FieldError::getDefaultMessage, Collectors.toList())));
+        Map<String, List<String>> errors = ex.getBindingResult()
+                                             .getFieldErrors()
+                                             .stream()
+                                             .collect(Collectors.groupingBy(FieldError::getField,
+                                                     Collectors.mapping(FieldError::getDefaultMessage, Collectors.toList())));
 
         var body = new APIErrorDTO();
 
@@ -78,12 +93,18 @@ public class ExceptionControllerAdvice extends ResponseEntityExceptionHandler {
     // --------------
 
     private ResponseEntity<APIErrorDTO> handlerException(HttpServletRequest request, Exception ex, HttpStatus status) {
+        return this.handlerException(request, ex, status, true);
+    }
+
+    private ResponseEntity<APIErrorDTO> handlerException(HttpServletRequest request, Exception ex, HttpStatus status, boolean logError) {
         var body = new APIErrorDTO();
 
         body.setCode(status.value());
         body.setMessage(ex.getMessage());
 
-        this.log.error(ex.getMessage(), ex);
+        if (logError) {
+            this.log.error(ex.getMessage(), ex);
+        }
 
         return new ResponseEntity<>(body, status);
     }
